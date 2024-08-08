@@ -1,0 +1,42 @@
+package com.jobNode.jobber.security.config;
+
+import com.jobNode.jobber.security.filters.JobberNodeAuthenticationFilter;
+import com.jobNode.jobber.security.filters.JobberNodeAuthourizationFilter;
+import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static com.jobNode.jobber.data.models.enums.Role.*;
+import static com.jobNode.jobber.security.utils.Utils.END_POINTS;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
+@Configuration
+@AllArgsConstructor
+public class SecurityConfig {
+    private final AuthenticationManager manager;
+    private final JobberNodeAuthourizationFilter authourizationFilter;
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        var authenticationFilter = new JobberNodeAuthenticationFilter(manager);
+            authenticationFilter.setFilterProcessesUrl(END_POINTS.getFirst());
+       return  httpSecurity.addFilterAt(new JobberNodeAuthenticationFilter(manager),
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JobberNodeAuthourizationFilter(), JobberNodeAuthenticationFilter.class)
+                .sessionManagement(customizer->customizer.sessionCreationPolicy(STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberNode/register").permitAll())
+                .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberNode/customer/**").hasAuthority(CUSTOMER.name()))
+                .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberNode/provider/**").hasAuthority(PROVIDER.name()))
+                .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberode/admin/**").hasAuthority(ADMIN.name()))
+                .build();
+    }
+}
