@@ -1,0 +1,17 @@
+package com.jobNode.jobber.dto.request;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
+@Builder
+public class CancelRequest {
+    private Long providerId;
+    private Long userId;
+    private Long orderId;
+    @NotBlank
+    private String reason;
+}
