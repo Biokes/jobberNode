@@ -27,6 +27,7 @@ import java.util.List;
 
 import static com.jobNode.jobber.security.utils.Utils.*;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RequiredArgsConstructor
 public class JobberNodeAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -60,7 +61,7 @@ public class JobberNodeAuthenticationFilter extends UsernamePasswordAuthenticati
         LoginResponse loginResponse = LoginResponse.builder().message("Successfully Logged in")
                 .token(token).build();
         ApiResponse<LoginResponse> apiResponse = ApiResponse.<LoginResponse>builder().data(loginResponse)
-                                                    .success(true).code(OK.value()).build();
+                                                    .success(true).status(OK).code(OK.value()).build();
         response.getOutputStream().write(objectMapper.writeValueAsBytes(apiResponse));
         response.flushBuffer();
         chain.doFilter(request,response);
@@ -71,7 +72,6 @@ public class JobberNodeAuthenticationFilter extends UsernamePasswordAuthenticati
                 .withExpiresAt(Instant.now().plusSeconds(60*60*24))
                 .withIssuer(APP_NAME)
                 .sign(Algorithm.HMAC512(SECRET));
-
         return token;
 
 
@@ -83,7 +83,12 @@ public class JobberNodeAuthenticationFilter extends UsernamePasswordAuthenticati
                                               HttpServletResponse response,
                                               AuthenticationException failed)
             throws IOException, ServletException {
+        LoginResponse loginResponse = LoginResponse.builder().message("Login Failed").build();
+        ApiResponse<LoginResponse> apiResponse = ApiResponse.<LoginResponse>builder()
+                .data(loginResponse).code(UNAUTHORIZED.value())
+                .status(UNAUTHORIZED).success(false).build();
+        response.getOutputStream().write(objectMapper.writeValueAsBytes(apiResponse));
+        response.flushBuffer();
     }
-//    @Override
-//    public Authentication attemptAuthentication(){}
+
 }
