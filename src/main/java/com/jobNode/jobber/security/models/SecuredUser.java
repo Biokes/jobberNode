@@ -1,6 +1,7 @@
 package com.jobNode.jobber.security.models;
 
 import com.jobNode.jobber.data.models.models.User;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,8 +9,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
+@AllArgsConstructor
 public class SecuredUser implements UserDetails {
-    private User user;
+    private final User user;
     @Override
     public String getPassword() {
         return user.getPassword();

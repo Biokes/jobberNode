@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import static com.jobNode.jobber.data.models.enums.Role.*;
 import static com.jobNode.jobber.security.utils.Utils.END_POINTS;
@@ -26,17 +27,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         var authenticationFilter = new JobberNodeAuthenticationFilter(manager);
-            authenticationFilter.setFilterProcessesUrl(END_POINTS.getFirst());
-       return  httpSecurity.addFilterAt(new JobberNodeAuthenticationFilter(manager),
-                        UsernamePasswordAuthenticationFilter.class)
+            authenticationFilter.setFilterProcessesUrl("api/v1/jobberNode/login");
+       return  httpSecurity.csrf(AbstractHttpConfigurer::disable)
+               .cors(AbstractHttpConfigurer::disable)
+               .addFilterAt(new JobberNodeAuthenticationFilter(manager), BasicAuthenticationFilter.class)
                 .addFilterBefore(new JobberNodeAuthourizationFilter(), JobberNodeAuthenticationFilter.class)
                 .sessionManagement(customizer->customizer.sessionCreationPolicy(STATELESS))
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberNode/cutomer/register","api/v1/jobbberNode/provider").permitAll())
-                .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberNode/customer/**").hasAuthority(CUSTOMER.name()))
-                .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberNode/provider/**").hasAuthority(PROVIDER.name()))
+                .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberNode/customer/register",
+                                            "api/v1/jobbberNode/provider/register").permitAll()
+                .requestMatchers("api/v1/jobberNode/customer/**").hasAuthority(CUSTOMER.name())
+                .requestMatchers("api/v1/jobberNode/provider/**").hasAuthority(PROVIDER.name()))
                 .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberode/admin/**").hasAuthority(ADMIN.name()))
                 .build();
     }
+
 }

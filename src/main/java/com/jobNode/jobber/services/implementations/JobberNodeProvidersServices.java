@@ -6,7 +6,6 @@ import com.jobNode.jobber.data.repository.*;
 import com.jobNode.jobber.dto.request.AcceptRequest;
 import com.jobNode.jobber.dto.request.ProviderRequest;
 import com.jobNode.jobber.dto.response.*;
-import com.jobNode.jobber.response.*;
 import com.jobNode.jobber.services.interfaces.ProvidersServices;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;

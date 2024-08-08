@@ -2,16 +2,16 @@ package com.jobNode.jobber.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Builder
 @Setter
 @Getter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class RegisterRequest {
     @NotBlank
     private String fullname;
@@ -21,7 +21,7 @@ public class RegisterRequest {
     private String password;
 //    @Pattern(regexp = "^[a-zA-z][a-zA-Z0-9-.,_:;]+@([a-zA-Z.,/@][])")
     private String email;
-    @JsonIgnore
+    @NotNull
     private AddressRequest address;
 
 }

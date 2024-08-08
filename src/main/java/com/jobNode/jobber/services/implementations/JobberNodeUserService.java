@@ -6,8 +6,6 @@ import com.jobNode.jobber.data.repository.*;
 import com.jobNode.jobber.dto.request.*;
 import com.jobNode.jobber.dto.response.*;
 import com.jobNode.jobber.exception.JobberNodeException;
-import com.jobNode.jobber.request.*;
-import com.jobNode.jobber.response.*;
 import com.jobNode.jobber.services.interfaces.UserService;
 import com.jobNode.jobber.services.interfaces.ProvidersServices;
 import jakarta.validation.Valid;
@@ -80,6 +78,12 @@ public class JobberNodeUserService implements UserService {
         review = reviewRepo.save(review);
         return buildReviewResponse(review);
     }
+
+    @Override
+    public User findUserByEmail(String username) {
+        return userRepository.findByEmail(username).get();
+    }
+
     private static Review buildReview(ReviewRequest request, Providers providers, User user) {
         return Review.builder()
                 .provider(providers)

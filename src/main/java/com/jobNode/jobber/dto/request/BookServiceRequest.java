@@ -7,9 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.jobNode.jobber.data.models.enums.Services;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.aspectj.lang.annotation.Before;
 
 import java.time.LocalDate;
@@ -17,6 +15,8 @@ import java.time.LocalDate;
 @Setter
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class BookServiceRequest {
     private Long id;
     @NotNull
