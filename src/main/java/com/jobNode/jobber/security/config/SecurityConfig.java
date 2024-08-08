@@ -33,7 +33,7 @@ public class SecurityConfig {
                 .sessionManagement(customizer->customizer.sessionCreationPolicy(STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberNode/register").permitAll())
+                .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberNode/cutomer/register","api/v1/jobbberNode/provider").permitAll())
                 .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberNode/customer/**").hasAuthority(CUSTOMER.name()))
                 .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberNode/provider/**").hasAuthority(PROVIDER.name()))
                 .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberode/admin/**").hasAuthority(ADMIN.name()))

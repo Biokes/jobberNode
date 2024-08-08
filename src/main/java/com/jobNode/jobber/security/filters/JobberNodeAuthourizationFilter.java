@@ -35,7 +35,7 @@ public class JobberNodeAuthourizationFilter extends OncePerRequestFilter {
         if(authourzation != null){
             String token = authourzation.substring(JWT_PREFIX.length()).strip();
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC512("secret".getBytes()))
-                    .withIssuer("mavericks_hub")
+                    .withIssuer("JobberNode")
                     .withClaimPresence("roles")
                     .build();
             DecodedJWT decodedJWT = jwtVerifier.verify(token);

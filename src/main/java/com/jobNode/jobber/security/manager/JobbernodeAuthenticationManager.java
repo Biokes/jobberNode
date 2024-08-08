@@ -17,6 +17,6 @@ public class JobbernodeAuthenticationManager implements AuthenticationManager {
         Class<? extends Authentication> authenticationType =authentication.getClass();
         if(authenticationProvider.supports(authenticationType))
             return authenticationProvider.authenticate(authentication);
-        throw new BadCredentialsException("pls Supply beta details");
+        throw new BadCredentialsException("Pls provide essential details.");
     }
 }

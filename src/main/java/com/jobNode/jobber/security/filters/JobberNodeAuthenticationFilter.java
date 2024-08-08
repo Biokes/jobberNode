@@ -32,7 +32,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @RequiredArgsConstructor
 public class JobberNodeAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response){
@@ -69,7 +69,7 @@ public class JobberNodeAuthenticationFilter extends UsernamePasswordAuthenticati
     public static String generateAccessToken(List<String> authorities){
         String token = JWT.create()
                 .withClaim(ROLES, authorities)
-                .withExpiresAt(Instant.now().plusSeconds(60*60*24))
+                .withExpiresAt(Instant.now().plusSeconds(60*60*72))
                 .withIssuer(APP_NAME)
                 .sign(Algorithm.HMAC512(SECRET));
         return token;
