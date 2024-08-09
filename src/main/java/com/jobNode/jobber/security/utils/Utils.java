@@ -13,4 +13,5 @@ public class Utils {
     public static String ROLES = "roles";
     public static String APP_NAME = "JobberNode";
     public static String SECRET = "secrets";
+    public static String[] CUSTOMER_END_POINTS = {"/api/v1/jobberNode/"};
 }

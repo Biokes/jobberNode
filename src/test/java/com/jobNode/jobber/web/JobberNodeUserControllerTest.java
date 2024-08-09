@@ -38,10 +38,9 @@ public class JobberNodeUserControllerTest {
                 .andExpect(status().isCreated())
                 .andDo(print());
     }
-
     private String getRegisterRequest() throws JsonProcessingException {
         return objectMapper.writeValueAsString(RegisterRequest.builder()
-                .email("email@email.com").password("password")
+                .email("email34009@email.com").password("password")
                 .address(AddressRequest.builder().housenumber("12").lga("lagos lga")
                         .street("laddo street").state("lagos").build()).fullname("Biokes")
                 .username("Abbey kodare").build());

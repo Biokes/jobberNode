@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import static com.jobNode.jobber.data.models.enums.Role.*;
+import static com.jobNode.jobber.security.utils.Utils.CUSTOMER_END_POINTS;
 import static com.jobNode.jobber.security.utils.Utils.END_POINTS;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
@@ -33,9 +34,9 @@ public class SecurityConfig {
                .addFilterAt(new JobberNodeAuthenticationFilter(manager), BasicAuthenticationFilter.class)
                 .addFilterBefore(new JobberNodeAuthourizationFilter(), JobberNodeAuthenticationFilter.class)
                 .sessionManagement(customizer->customizer.sessionCreationPolicy(STATELESS))
-                .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberNode/customer/register",
+                .authorizeHttpRequests(c->c.requestMatchers(POST,"api/v1/jobberNode/customer/register",
                                             "api/v1/jobbberNode/provider/register").permitAll()
-                .requestMatchers("api/v1/jobberNode/customer/**").hasAuthority(CUSTOMER.name())
+                .requestMatchers(CUSTOMER_END_POINTS).hasAuthority(CUSTOMER.name())
                 .requestMatchers("api/v1/jobberNode/provider/**").hasAuthority(PROVIDER.name()))
                 .authorizeHttpRequests(c->c.requestMatchers("api/v1/jobberode/admin/**").hasAuthority(ADMIN.name()))
                 .build();

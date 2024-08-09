@@ -5,15 +5,16 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.jobNode.jobber.data.models.enums.RegisterationState;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Setter
 @ToString
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class RegisterResponse {
     private Long id;
     private RegisterationState registerationState;
