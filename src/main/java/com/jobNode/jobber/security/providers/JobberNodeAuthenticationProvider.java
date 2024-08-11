@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import static com.jobNode.jobber.exception.ExceptionMessages.INVALID_DETAILS;
+
 
 @AllArgsConstructor
 @Component
@@ -25,7 +27,7 @@ public class JobberNodeAuthenticationProvider implements AuthenticationProvider 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         if(passwordEncoder.matches(password,userDetails.getPassword()))
             return new UsernamePasswordAuthenticationToken(null, null, userDetails.getAuthorities());
-        throw new BadCredentialsException("Invalid details provided");
+        throw new BadCredentialsException(INVALID_DETAILS.getMessage());
     }
 
     @Override

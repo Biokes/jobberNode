@@ -16,14 +16,14 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 public class JobbeNodeExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseBody
-    public ResponseEntity<?> dataIntegrityConstraint(DataIntegrityViolationException exception){
+    public ResponseEntity<?> dataIntegrityConstraint(DataIntegrityViolationException exception) {
         return ResponseEntity.status(BAD_REQUEST).body(Map.
-                of("error",INVALID_DETAILS.getMessage(),"success",false));
+                of("error", INVALID_DETAILS.getMessage(), "success", false));
     }
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public ResponseEntity<?> dataIntegrityConstraint(Exception exception){
+    public ResponseEntity<?> exceptionHandler(Exception exception){
         return ResponseEntity.status(BAD_REQUEST).body(Map.
-                of("error",SOMETHING_WENT_WRONG.getMessage(),"success",false));
+                of("error",exception.getMessage()   ,"success",false));
     }
 }

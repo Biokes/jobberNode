@@ -8,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
+import static com.jobNode.jobber.exception.ExceptionMessages.INVALID_DETAILS;
+
 @Component
 @AllArgsConstructor
 public class JobbernodeAuthenticationManager implements AuthenticationManager {
@@ -17,6 +19,6 @@ public class JobbernodeAuthenticationManager implements AuthenticationManager {
         Class<? extends Authentication> authenticationType =authentication.getClass();
         if(authenticationProvider.supports(authenticationType))
             return authenticationProvider.authenticate(authentication);
-        throw new BadCredentialsException("Pls provide essential details.");
+        throw new BadCredentialsException(INVALID_DETAILS.getMessage());
     }
 }

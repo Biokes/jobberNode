@@ -16,38 +16,37 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/api/v1/jobberNode/customer")
+@RequestMapping("/api/v1/jobberNode")
 public class UserController {
-    @PostMapping("/register")
+    @PostMapping("/customer/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest request){
-        return ResponseEntity.status(201).body(ApiResponse.<RegisterResponse>builder().status(CREATED)
-                .data(userService.register(request)).success(true).build());
+        return ResponseEntity.status(201).body(userService.register(request));
     }
-    @PostMapping("/bookService")
+    @PostMapping("/customer/bookService")
     public ResponseEntity<?> bookService(@RequestBody @Valid BookServiceRequest bookServiceRequest){
-       return ResponseEntity.status(200).body(ApiResponse.<BookResponse>builder().status(OK)
+       return ResponseEntity.status(200).body(ApiResponse.builder().status(OK)
                .data(userService.bookService(bookServiceRequest)).success(true).build());
     }
-    @PatchMapping("/cancelBooking")
+    @PatchMapping("/customer/cancelBooking")
     public ResponseEntity<?> cancelBooking(@RequestBody @Valid CancelRequest cancelRequest){
-        return ResponseEntity.status(200).body(ApiResponse.<BookResponse>builder().status(OK)
+        return ResponseEntity.status(200).body(ApiResponse.builder().status(OK)
                 .data(userService.cancelRequest(cancelRequest)).success(true).build());
     }
-    @GetMapping("/myNotifications/id={id}")
-    public ResponseEntity<?> notifications(@NotNull @PathVariable Long id){
-        return ResponseEntity.status(200).body(ApiResponse.<List<NotificationResponse>>builder()
+    @GetMapping("/customer/myNotifications/{id}")
+    public ResponseEntity<?> notifications(@NotNull @PathVariable(value = "id") Long id){
+        return ResponseEntity.status(200).body(ApiResponse.builder()
                 .status(OK).data(userService.getNotificationsWith(id)).success(true).build());
     }
-    @PostMapping("/review")
+    @PostMapping("/customer/review")
     public ResponseEntity<?> dropReview(@Valid @RequestBody ReviewRequest request){
-        return ResponseEntity.status(200).body(ApiResponse.<ReviewResponse>builder()
+        return ResponseEntity.status(200).body(ApiResponse.builder()
                 .status(OK).success(true)
                 .data(userService.dropReview(request)).build());
     }
-    @GetMapping("/findProviders")
+    @GetMapping("/customer/findProviders")
     public ResponseEntity<?> getProviders(@Valid @RequestBody FindServiceRequest request){
         return ResponseEntity.status(200)
-                .body(ApiResponse.<List<ProviderResponse>>builder().success(true)
+                .body(ApiResponse.builder().success(true)
                         .status(OK)
                         .data(userService.findAllByService(request)).build());
     }
