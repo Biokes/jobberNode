@@ -25,9 +25,15 @@ public class JobberNodeAuthenticationProvider implements AuthenticationProvider 
         String username = authentication.getPrincipal().toString();
         String password = authentication.getCredentials().toString();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        confirmLogin();
         if(passwordEncoder.matches(password,userDetails.getPassword()))
             return new UsernamePasswordAuthenticationToken(null, null, userDetails.getAuthorities());
+
         throw new BadCredentialsException(INVALID_DETAILS.getMessage());
+    }
+
+    private void confirmLogin() {
+//        if(token.i)
     }
 
     @Override

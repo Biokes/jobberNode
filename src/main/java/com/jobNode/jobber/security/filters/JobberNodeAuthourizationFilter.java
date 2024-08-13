@@ -19,8 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
-import static com.jobNode.jobber.security.utils.Utils.END_POINTS;
-import static com.jobNode.jobber.security.utils.Utils.JWT_PREFIX;
+import static com.jobNode.jobber.security.utils.Utils.*;
 
 @Component
 public class JobberNodeAuthourizationFilter extends OncePerRequestFilter {
@@ -39,8 +38,7 @@ public class JobberNodeAuthourizationFilter extends OncePerRequestFilter {
             String token = authourization.substring(JWT_PREFIX.length()).strip();
             JWTVerifier jwtVerifier = getJwtVerifier();
             DecodedJWT decodedJWT = jwtVerifier.verify(token);
-            List<SimpleGrantedAuthority> authorities = decodedJWT.getClaim("roles")
-                    .asList(SimpleGrantedAuthority.class);
+            List<SimpleGrantedAuthority> authorities = decodedJWT.getClaim(ROLES).asList(SimpleGrantedAuthority.class);
             Authentication authentication =
                     new UsernamePasswordAuthenticationToken(null, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -49,9 +47,9 @@ public class JobberNodeAuthourizationFilter extends OncePerRequestFilter {
     }
 
     private static JWTVerifier getJwtVerifier() {
-        return JWT.require(Algorithm.HMAC512("secret".getBytes()))
-                .withIssuer("JobberNode")
-                .withClaimPresence("roles")
+        return JWT.require(Algorithm.HMAC512(SECRET))
+                .withIssuer(APP_NAME)
+                .withClaimPresence(ROLES)
                 .build();
     }
 }

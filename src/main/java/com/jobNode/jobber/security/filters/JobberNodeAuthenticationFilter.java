@@ -31,7 +31,6 @@ import static com.jobNode.jobber.security.utils.Utils.*;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-@Slf4j
 @RequiredArgsConstructor
 public class JobberNodeAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
@@ -57,8 +56,6 @@ public class JobberNodeAuthenticationFilter extends UsernamePasswordAuthenticati
         List<String> role =roles.stream().map(GrantedAuthority::getAuthority).toList();
         String token = generateAccessToken(role);
         LoginResponse loginResponse = LoginResponse.builder().message("Successfully Logged in").token(token).build();
-        log.info("ROLES ---------------->{}",role);
-        log.info("TOKEN ---------------->{}",token);
         ApiResponse apiResponse = getLoginResponse(loginResponse);
         response.setContentType(APPLICATION_JSON_VALUE);
         response.getOutputStream().write(objectMapper.writeValueAsBytes(apiResponse));

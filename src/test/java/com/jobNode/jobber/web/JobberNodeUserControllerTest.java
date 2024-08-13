@@ -12,11 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 
 import static com.jobNode.jobber.data.models.enums.Services.PLUMBING;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -30,7 +32,7 @@ public class JobberNodeUserControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-    private String token ="eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJDVVNUT01FUiJdLCJleHAiOjE3MjM1OTk3NTEsImlzcyI6IkpvYmJlck5vZGUifQ.jlNk1OVaB-pQ-Di40Wrq43DQ-X_UeZnhgZC0uBdSm0WdaEU9AeJ8qmHkvIV-hLaPG4ZMxTf6RQ5cnDTTdoDXtA";
+    private final String token ="eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJDVVNUT01FUiJdLCJleHAiOjE3MjM3NTY3OTAsImlzcyI6IkpvYmJlck5vZGUifQ.XkUwDTiQdYy2kHqnATx4PGEdwQvnzVa1bswCG6qsHf6ChZx0u9hNCLcYgl5nQH25YvgRJ2pO4TJGpIcqojXFeQ";
     @Test
     void testUserCanRegister() throws Exception {
         String registerRequest = getRegisterRequest("email34028@email.com");
@@ -52,6 +54,7 @@ public class JobberNodeUserControllerTest {
                 .andDo(print());
     }
     @Test
+    @WithMockUser(authorities = {"CUSTOMER"})
     void testCustomerCanBookService() throws Exception{
         String request = objectMapper.writeValueAsString(
                 BookServiceRequest.builder().service(Services.NURSING).id(74L)
@@ -91,5 +94,15 @@ public class JobberNodeUserControllerTest {
                 .address(AddressRequest.builder().housenumber("12").lga("lagos lga")
                         .street("laddo street").state("lagos").build()).fullname("Biokes")
                 .username("Abbey kodare").build());
+    }
+    @Test
+    void testCustomerCanLogOut()throws Exception{
+        String request = "email34028@email.com";
+        mockMvc.perform(post("/api/v1/jobberNode/logout")
+                        .header(AUTHORIZATION,token)
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andDo(print());
+
     }
 }
