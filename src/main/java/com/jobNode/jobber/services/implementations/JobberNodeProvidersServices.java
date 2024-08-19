@@ -3,8 +3,9 @@ package com.jobNode.jobber.services.implementations;
 import com.jobNode.jobber.data.models.models.*;
 import com.jobNode.jobber.data.models.enums.Services;
 import com.jobNode.jobber.data.repository.*;
-import com.jobNode.jobber.dto.request.AcceptRequest;
+import com.jobNode.jobber.dto.request.OfferRequest;
 import com.jobNode.jobber.dto.request.ProviderRequest;
+import com.jobNode.jobber.dto.request.TerminateOfferRequest;
 import com.jobNode.jobber.dto.response.*;
 import com.jobNode.jobber.services.interfaces.ProvidersServices;
 import jakarta.validation.Valid;
@@ -42,14 +43,32 @@ public class JobberNodeProvidersServices implements ProvidersServices {
     }
     @Override
     @Transactional
-    public BookResponse acceptOffer(AcceptRequest acceptRequest) {
+    public BookResponse acceptOffer(OfferRequest acceptRequest){
         CustomerOrder order =orderRepo.findById(acceptRequest.getOrderId()).get();
         order.setStatus(ACCEPTED);
         order.setTimeUpdated(now());
+        orderRepo.save(order);
+        sendNotificationTo(order.getProvider(),order.getCustomer());
         return BookResponse.builder().customerId(order.getCustomer().getId())
                 .bookingMessage("Job Offer Accepted.").timeStamp(order.getTimeStamp())
                 .timeUpdated(order.getTimeUpdated()).providerId(order.getProvider().getId())
                 .orderId(order.getId()).status(order.getStatus()).build();
+    }
+
+    private void sendNotificationTo(Providers provider, User customer) {
+        sendNotificationTo(provider);
+        sendNotificationTo(customer);
+    }
+
+    private void sendNotificationTo(Providers provider) {
+        Notification notification = new Notification(null, provider.getUser(),now(),
+                "You Accepted an order",false);
+        notificationRepo.save(notification);
+    }
+    private void sendNotificationTo(User user){
+        Notification notification = new Notification(null, user,now(),
+                "You Booking Has been Accepted",false);
+        notificationRepo.save(notification);
     }
 
     @Override
@@ -62,6 +81,11 @@ public class JobberNodeProvidersServices implements ProvidersServices {
                 .reviewId(review.getId())
                 .userId(review.getReviewer().getId())
                 .build()).toList();
+    }
+
+    @Override
+    public BookResponse terminateOrder(TerminateOfferRequest offer) {
+        return null;
     }
 
     @Override

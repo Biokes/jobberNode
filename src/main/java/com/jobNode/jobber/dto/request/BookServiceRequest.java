@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.aspectj.lang.annotation.Before;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Setter
@@ -25,6 +26,8 @@ public class BookServiceRequest {
     private Long providerId;
     @NotBlank
     private String description;
+    @NotNull
+    private BigDecimal price;
     @NotNull
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)

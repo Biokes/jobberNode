@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ExceptionMessages {
     BOOKED("Your request is sent"),
+    LOGIN_FAILED("Invalid Login Details Provided"),
     SOMETHING_WENT_WRONG("Something went wrong"),
     INVALID_DETAILS("Invalid Details provided. pls check details provided");
     final String message;

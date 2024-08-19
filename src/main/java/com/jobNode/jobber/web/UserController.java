@@ -9,9 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
@@ -30,7 +27,7 @@ public class UserController {
     @PatchMapping("/customer/cancelBooking")
     public ResponseEntity<?> cancelBooking(@RequestBody @Valid CancelRequest cancelRequest){
         return ResponseEntity.status(200).body(ApiResponse.builder().status(OK)
-                .data(userService.cancelRequest(cancelRequest)).success(true).build());
+                .data(userService.cancelBooking(cancelRequest)).success(true).build());
     }
     @GetMapping("/customer/myNotifications/{id}")
     public ResponseEntity<?> notifications(@NotNull @PathVariable(value = "id") Long id){

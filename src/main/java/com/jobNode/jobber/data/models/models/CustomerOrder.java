@@ -4,6 +4,7 @@ import com.jobNode.jobber.data.models.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static jakarta.persistence.EnumType.STRING;
@@ -27,7 +28,9 @@ public class CustomerOrder {
     private Providers provider;
     @ManyToOne
     private User customer;
+    private String description;
     private LocalDateTime timeUpdated;
+    private BigDecimal price;
     @PrePersist
     private void setTimeStamp(){
         timeStamp= now();

@@ -47,7 +47,7 @@ public class JobberNodeAuthourizationFilter extends OncePerRequestFilter {
     }
 
     private static JWTVerifier getJwtVerifier() {
-        return JWT.require(Algorithm.HMAC512(SECRET))
+        return JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
                 .withIssuer(APP_NAME)
                 .withClaimPresence(ROLES)
                 .build();

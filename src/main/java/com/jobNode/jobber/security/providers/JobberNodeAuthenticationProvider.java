@@ -28,7 +28,6 @@ public class JobberNodeAuthenticationProvider implements AuthenticationProvider 
         confirmLogin();
         if(passwordEncoder.matches(password,userDetails.getPassword()))
             return new UsernamePasswordAuthenticationToken(null, null, userDetails.getAuthorities());
-
         throw new BadCredentialsException(INVALID_DETAILS.getMessage());
     }
 

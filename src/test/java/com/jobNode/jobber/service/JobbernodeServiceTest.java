@@ -11,7 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -59,8 +61,9 @@ public class JobbernodeServiceTest {
         log.info("BOOKResponse --------------------->{}",bookResponse);
         assertEquals(1,providerService.notifications(response.getId()).size());
         CancelRequest cancelRequest = CancelRequest.builder().orderId(bookResponse.getOrderId())
+                .reason("not interested again")
                 .providerId(response.getId()).userId(1L).build();
-        bookResponse = userService.cancelRequest(cancelRequest);
+        bookResponse = userService.cancelBooking(cancelRequest);
         log.info("BOOKResponse Canceled --------------------->{}",bookResponse);
         assertNotNull(bookResponse);
         assertEquals(2,providerService.notifications(response.getId()).size());
@@ -68,7 +71,7 @@ public class JobbernodeServiceTest {
         bookResponse = userService.bookService(bookRequest);
         log.info("BOOKResponse --------------------->{}",bookResponse);
         assertEquals(3,providerService.notifications(response.getId()).size());
-        AcceptRequest acceptRequest = AcceptRequest.builder().orderId(bookResponse.getOrderId()).build();
+        OfferRequest acceptRequest = OfferRequest.builder().orderId(bookResponse.getOrderId()).build();
         BookResponse acceptedOffer = providerService.acceptOffer(acceptRequest);
         assertNotNull(response);
         assertEquals(2,userService .getNotificationsWith(1L).size());
@@ -82,10 +85,22 @@ public class JobbernodeServiceTest {
         log.info("Review Response ----------------->{}",response);
         assertEquals(1,providerService.getReviews(17L).size());
     }
+    @Test
+    @Transactional
+    void testProviderCanDeclineBookingAfterAccepting(){
+        TerminateOfferRequest offer = new TerminateOfferRequest("not interested again",
+                17L,17L);
+        BookResponse response = providerService.terminateOrder(offer);
+        assertNotNull(response);
+        log.info("Response------>{}",response);
+
+    }
     private static BookServiceRequest getBookRequest(ProviderResponse providerResponse){
         return BookServiceRequest.builder().id(1L)
                 .service(PLUMBING)
                 .providerId(providerResponse.getId())
+                .description("i need ur service")
+                .price(new BigDecimal("59000"))
                 .proposedDate(LocalDate.parse("2007-04-12"))
                 .build();
     }

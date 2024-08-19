@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +32,6 @@ public class JobberNodeUserService implements UserService {
         User user = mapUser(request);
         return modelMapper.map(user,RegisterResponse.class);
     }
-
     @Override
     @Transactional
     public List<ProviderResponse> findAllByService(@Valid FindServiceRequest seviceRequest) {
@@ -41,10 +39,9 @@ public class JobberNodeUserService implements UserService {
         if (optionalUser.isEmpty()) throw new JobberNodeException(INVALID_DETAILS.getMessage());
         return providersServices.findAllByService(seviceRequest.getService());
     }
-
     @Override
     @Transactional
-    public BookResponse bookService(@Valid BookServiceRequest bookRequest) {//id = user, providerId = provider
+    public BookResponse bookService(@Valid BookServiceRequest bookRequest){
         CustomerOrder customerOrder = buildOrder(bookRequest);
         customerOrder = orderRepo.save(customerOrder);
         Notification notification = createNotification(bookRequest);
@@ -54,11 +51,10 @@ public class JobberNodeUserService implements UserService {
                 .status(customerOrder.getStatus()).timeStamp(customerOrder.getTimeStamp())
                 .bookingMessage(BOOKED.getMessage()).build();
     }
-
     @Override
     @Transactional
-    public BookResponse cancelRequest(@Valid CancelRequest cancelRequest) {
-        CustomerOrder order = getCustomerOrder(cancelRequest);
+    public BookResponse cancelBooking(@Valid CancelRequest cancelRequest) {
+        CustomerOrder order = ternminateService(cancelRequest);
         notifyUserAndProvider(cancelRequest);
         return getBookResponse(cancelRequest, order);
     }
@@ -71,19 +67,21 @@ public class JobberNodeUserService implements UserService {
     }
     @Override
     @Transactional
-    public ReviewResponse dropReview(ReviewRequest request)
-    {
+    public ReviewResponse dropReview(ReviewRequest request){
         Providers providers =providerRepo.findById(request.getProviderId()).get();
         User user = userRepository.findById(request.getUserId()).get();
         Review review = buildReview(request, providers, user);
         review = reviewRepo.save(review);
+        notifyUser(providers.getUser().getId(),"Recieved a review");
         return buildReviewResponse(review);
     }
-
     @Override
-    public User findUserByEmail(String username) {
+    public User findUserByEmail(String username){
         return userRepository.findByEmail(username).get();
     }
+
+
+
 
     private static Review buildReview(ReviewRequest request, Providers providers, User user) {
         return Review.builder()
@@ -117,11 +115,13 @@ public class JobberNodeUserService implements UserService {
     private CustomerOrder buildOrder(BookServiceRequest bookRequest){
         return CustomerOrder.builder()
                 .status(Status.PENDING)
+                .description(bookRequest.getDescription())
+                .price(bookRequest.getPrice())
                 .customer(userRepository.findById(bookRequest.getId()).get())
                 .provider(providerRepo.findById(bookRequest.getProviderId()).get())
                 .build();
     }
-    private CustomerOrder getCustomerOrder(CancelRequest cancelRequest) {
+    private CustomerOrder ternminateService(CancelRequest cancelRequest) {
         CustomerOrder order = orderRepo.findById(cancelRequest.getOrderId()).get();
         order.setStatus(Status.TERMINATED);
         order.setTimeUpdated(now());
@@ -153,8 +153,7 @@ public class JobberNodeUserService implements UserService {
     public JobberNodeUserService(ModelMapper modelMapper, UserRepository userReepository,
                                  NotificationRepository notificationRepo, PasswordEncoder encoder,
                                  ProvidersServices providersServices, ProviderRepository providerRepo,
-                                 OrderRepository orderRepo, ReviewRepository reviewRepo)
-    {
+                                 OrderRepository orderRepo, ReviewRepository reviewRepo) {
         this.orderRepo= orderRepo;
         this.modelMapper= modelMapper;
         this.userRepository= userReepository;
@@ -173,3 +172,26 @@ public class JobberNodeUserService implements UserService {
     private final NotificationRepository notificationRepo;
     private final ReviewRepository reviewRepo;
 }
+//public class PaymentServiceImpl implements PaymentService{
+//    private final Config config;
+//    private final RestTemplate restTemplate;
+//    @Value("https://api.paystack.co/transaction/initialize")
+//    private String initializeEndpoint ;
+//    private final ModelMapper modelMapper;
+//    @Value("https://api.paystack.co/transaction/verify/")
+//    private String verifyEndpoint;
+//    @Override
+//    public PaymentResponse initializePayment(PaymentRequest paymentRequest) {
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(APPLICATION_JSON);
+//        headers.setBearerAuth(config.getSecretKey());
+//        HttpEntity<PaymentRequest> paymentRequestHttpEntity = new HttpEntity<>(paymentRequest,headers);
+//        ResponseEntity<PaymentResponse> response = restTemplate.postForEntity(initializeEndpoint,paymentRequestHttpEntity, PaymentResponse.class);
+//        return response.getBody();
+//    public VerifyPaymentResponse verifyPayment(String reference) {
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(APPLICATION_JSON);
+//        headers.setBearerAuth(config.getSecretKey());
+//        HttpEntity<String> paymentRequestHttpEntity = new HttpEntity<>(reference,headers);
+//        ResponseEntity<VerifyPaymentResponse> response = restTemplate.exchange(verifyEndpoint+reference,GET,paymentRequestHttpEntity, VerifyPaymentResponse.class);
+//        return response.getBody();
