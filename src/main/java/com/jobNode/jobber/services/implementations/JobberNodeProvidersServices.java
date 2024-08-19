@@ -54,7 +54,58 @@ public class JobberNodeProvidersServices implements ProvidersServices {
                 .timeUpdated(order.getTimeUpdated()).providerId(order.getProvider().getId())
                 .orderId(order.getId()).status(order.getStatus()).build();
     }
-
+    @Override
+    public List<ReviewResponse> getReviews(long id) {
+        List<Review> reviews =  reviewRepo.findAllByProviderId(id);
+        return reviews.stream().map(review->ReviewResponse.builder()
+                .providerId(review.getProvider().getId())
+                .reviewNote(review.getDescription())
+                .timeStamp(review.getTimeCreated())
+                .reviewId(review.getId())
+                .userId(review.getReviewer().getId())
+                .build()).toList();
+    }
+    @Override
+    public BookResponse terminateOrder(TerminateOfferRequest offer) {
+        return null;
+    }
+    @Override
+    @Transactional
+    public ProviderResponse register(@Valid ProviderRequest providerRequest){
+        User user = modelMapper.map(providerRequest.getRequest(),User.class);
+        Providers providers = createProvider(providerRequest, userRepository.save(user));
+        RegisterResponse registerResponse = modelMapper.map(providers.getUser(), RegisterResponse.class);
+        return getProviderResponse(registerResponse, providers);
+    }
+    @Autowired
+    public JobberNodeProvidersServices(NotificationRepository notificationRepo,ProviderRepository repository,
+                                       ModelMapper modelMapper,PasswordEncoder encoder,UserRepository userRepository,
+                                       OrderRepository orderRepo, ReviewRepository reviewRepo){
+        this.notificationRepo = notificationRepo;
+        this.repository = repository;
+        this.modelMapper= modelMapper;
+        this.encoder = encoder;
+        this.userRepository= userRepository;
+        this.orderRepo = orderRepo;
+        this.reviewRepo= reviewRepo;
+    }
+    private Providers createProvider(ProviderRequest providerRequest, User user){
+        Providers providers = new Providers();
+        providers.setServices(providerRequest.getServicesList());
+        providers.setUser(user);
+        providers.getUser().setRegisterationState(PENDING);
+        providers.getUser().setAddress(modelMapper.map(providerRequest.getRequest().getAddress(), Address.class));
+        providers.getUser().setRole(PROVIDER);
+        providers.getUser().setPassword(encoder.encode(user.getPassword()));
+        providers = repository.save(providers);
+        return providers;
+    }
+    private static ProviderResponse getProviderResponse(RegisterResponse registerResponse, Providers providers) {
+        return ProviderResponse.builder()
+                .response(registerResponse)
+                .id(providers.getId())
+                .services(providers.getServices()).build();
+    }
     private void sendNotificationTo(Providers provider, User customer) {
         sendNotificationTo(provider);
         sendNotificationTo(customer);
@@ -70,61 +121,11 @@ public class JobberNodeProvidersServices implements ProvidersServices {
                 "You Booking Has been Accepted",false);
         notificationRepo.save(notification);
     }
-
-    @Override
-    public List<ReviewResponse> getReviews(long id) {
-        List<Review> reviews =  reviewRepo.findAllByProviderId(id);
-        return reviews.stream().map(review->ReviewResponse.builder()
-                .providerId(review.getProvider().getId())
-                .reviewNote(review.getDescription())
-                .timeStamp(review.getTimeCreated())
-                .reviewId(review.getId())
-                .userId(review.getReviewer().getId())
-                .build()).toList();
-    }
-
-    @Override
-    public BookResponse terminateOrder(TerminateOfferRequest offer) {
-        return null;
-    }
-
-    @Override
-    @Transactional
-    public ProviderResponse register(@Valid ProviderRequest providerRequest){
-        User user = modelMapper.map(providerRequest.getRequest(),User.class);
-        Providers providers = createProvider(providerRequest, userRepository.save(user));
-        RegisterResponse registerResponse = modelMapper.map(providers.getUser(), RegisterResponse.class);
-        return getProviderResponse(registerResponse, providers);
-    }
-    private static ProviderResponse getProviderResponse(RegisterResponse registerResponse, Providers providers) {
-        return ProviderResponse.builder()
-                .response(registerResponse)
-                .id(providers.getId())
-                .services(providers.getServices()).build();
-    }
-    private Providers createProvider(ProviderRequest providerRequest, User user){
-        Providers providers = new Providers();
-        providers.setServices(providerRequest.getServicesList());
-        providers.setUser(user);
-        providers.getUser().setRegisterationState(PENDING);
-        providers.getUser().setAddress(modelMapper.map(providerRequest.getRequest().getAddress(), Address.class));
-        providers.getUser().setRole(PROVIDER);
-        providers.getUser().setPassword(encoder.encode(user.getPassword()));
-        providers = repository.save(providers);
-        return providers;
-    }
-    @Autowired
-    private NotificationRepository notificationRepo;
-    @Autowired
-    private ProviderRepository repository;
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private PasswordEncoder encoder;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private OrderRepository orderRepo;
-    @Autowired
-    private ReviewRepository reviewRepo;
+    private final NotificationRepository notificationRepo;
+    private final ProviderRepository repository;
+    private final ModelMapper modelMapper;
+    private final PasswordEncoder encoder;
+    private final UserRepository userRepository;
+    private final OrderRepository orderRepo;
+    private final ReviewRepository reviewRepo;
 }
